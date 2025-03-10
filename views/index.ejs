@@ -1,0 +1,90 @@
+<%- include("partials/header.ejs") %>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+<div class="container">
+<% if (typeof events === 'todo') { var events = []; } %>
+
+<header>
+    <h1>What's On Your Mind<span>?</span></h1>
+    <div class="calendar">
+        <table>
+            <thead>
+                <tr>
+                    <th>Sun</th>
+                    <th>Mon</th>
+                    <th>Tue</th>
+                    <th>Wed</th>
+                    <th>Thu</th>
+                    <th>Fri</th>
+                    <th>Sat</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% 
+                    const today = moment(); 
+                    const firstDayOfMonth = moment().startOf('month'); 
+                    const lastDayOfMonth = moment().endOf('month'); 
+                    const startingDay = firstDayOfMonth.day(); 
+                    let dayCounter = 1; 
+                %>
+                <% for (let i = 0; i < 6; i++) { %>
+                    <tr>
+                        <% for (let j = 0; j < 7; j++) { %>
+                            <% if (i === 0 && j < startingDay) { %>
+                                <td></td>
+                            <% } else if (dayCounter <= lastDayOfMonth.date()) { %>
+                                <td <% if (today.date() === dayCounter && today.month() === firstDayOfMonth.month()) { %> 
+                                    class="today"
+                                 <% } %>>
+                                    <%= dayCounter %>
+                                    <% events.forEach(event => { %>
+                                        <% if (moment(event.date).date() === dayCounter && moment(event.date).month() === firstDayOfMonth.month()) { %>
+                                            <div class="event-indicator"></div>
+                                        <% } %>
+                                    <% }) %>
+                                </td>
+                                <% dayCounter++; %>
+                            <% } else { %>
+                                <td></td>
+                            <% } %>
+                        <% } %>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
+</header>
+
+<main id="main-event">
+    <h2>Todo for Today:</h2>
+    <form class="add-form"   action="/add" method="POST" class="add-event">
+        <input type="text" id="title" name="title" required>
+        <input type="date" id="date" name="date" required >
+        <button class="add-btn" type="submit">+</button>
+    </form>
+
+    <h2>Lists:</h2>
+    <ul>
+        <% events.forEach(event => { %>
+            <li>
+                <%= event.title %> - <%= moment(event.date).format('MMMM DD, YYYY') %>
+
+                <!-- Edit Form -->
+                <form class="edit-input" action="/edit" method="POST" >
+                    <input  class="ed-input" type="hidden" name="updateId" value="<%= event.id %>" >
+                    <input class="del-input"  type="text" name="updateTitle" value="<%= event.title %>" >
+    <button type="submit">✍︎</button>
+                </form>
+
+
+                <!-- Delete Form -->
+                <form action="/delete" method="POST"  >
+                    <input  type="hidden" name="deleteId" value="<%= event.id %>">
+                    <button class="delete-btn"   type="submit">x</button>
+                </form>
+            </li>
+        <% }) %>
+    </ul>
+</main>
+<%- include("partials/footer.ejs") %>
+</div>
+
