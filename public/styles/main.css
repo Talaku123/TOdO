@@ -176,9 +176,10 @@ ul,
 li {
     color: dimgray;
     font-size: 14px ;
+    list-style: none;
+    line-height: 30px;
     margin: 5px 0;
     padding: 2px 0;
-    text-align: center;
 }   
  
 
